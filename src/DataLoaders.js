@@ -69,6 +69,14 @@ export default {
         .then(mapTo(keys, x => x.id, 'Story')),
     ),
 
+    members: new DataLoader(keys =>
+      db
+        .table('members')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id, 'Member')),
+    ),
+
     storyCommentsCount: new DataLoader(keys =>
       db
         .table('stories')

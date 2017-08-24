@@ -9,36 +9,42 @@
 
 /* @flow */
 
-import {
-  GraphQLObjectType,
-  GraphQLList,
-  GraphQLString,
-  GraphQLBoolean,
-} from 'graphql';
-
+import { GraphQLObjectType, GraphQLString, GraphQLBoolean } from 'graphql';
 import { globalIdField } from 'graphql-relay';
-
-import EmailType from './EmailType';
 import { nodeInterface } from './Node';
 
 export default new GraphQLObjectType({
-  name: 'User',
+  name: 'Member',
   interfaces: [nodeInterface],
 
   fields: {
     id: globalIdField(),
 
-    displayName: {
+    firstName: {
       type: GraphQLString,
       resolve(parent) {
-        return parent.display_name;
+        return parent.first_name;
       },
     },
 
-    imageUrl: {
+    lastName: {
       type: GraphQLString,
       resolve(parent) {
-        return parent.image_url;
+        return parent.last_name;
+      },
+    },
+
+    email: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent.email;
+      },
+    },
+
+    dateOfBirth: {
+      type: GraphQLString,
+      resolve(parent) {
+        return parent.date_of_birth;
       },
     },
 
@@ -49,10 +55,10 @@ export default new GraphQLObjectType({
       },
     },
 
-    emails: {
-      type: new GraphQLList(EmailType),
-      resolve(parent, args, { user }) {
-        return user && parent.id === user.id ? parent.emails : null;
+    payed: {
+      type: GraphQLBoolean,
+      resolve(parent) {
+        return parent.payed;
       },
     },
   },

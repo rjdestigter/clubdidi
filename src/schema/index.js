@@ -15,6 +15,7 @@ import { me } from './User';
 import { node, nodes } from './Node';
 import { stories, createStory, updateStory } from './Story';
 import { createComment, updateComment } from './Comment';
+import members, { createMember } from './Members';
 
 export default new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -24,6 +25,7 @@ export default new GraphQLSchema({
       node,
       nodes,
       stories,
+      members,
     },
   }),
   mutation: new GraphQLObjectType({
@@ -33,6 +35,7 @@ export default new GraphQLSchema({
       updateStory,
       createComment,
       updateComment,
+      createMember,
     },
   }),
 });
