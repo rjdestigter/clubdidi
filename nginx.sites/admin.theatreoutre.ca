@@ -36,6 +36,6 @@ server {
 
     location / {
         include snippets/proxy-params.conf;
-        proxy_pass http://web:3000;
+        proxy_pass http://api:3000;
     }
 }
