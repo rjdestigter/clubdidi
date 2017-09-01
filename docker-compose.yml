@@ -10,7 +10,6 @@ services:
     image: nginx:1.13.3-alpine
     links:
       - api
-      - web
     read_only: true
     tmpfs:
       - /var/cache/nginx
@@ -45,16 +44,6 @@ services:
     read_only: true
     volumes:
       - redis:/data
-
-  web:
-    image: web
-    read_only: true
-    restart: always
-    environment:
-      - PORT=3000
-      - NODE_ENV=production
-    expose:
-      - '3000'
 
   api:
     image: api
