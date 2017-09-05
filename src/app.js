@@ -26,7 +26,6 @@ import i18nextBackend from 'i18next-node-fs-backend';
 import expressGraphQL from 'express-graphql';
 import PrettyError from 'pretty-error';
 import { printSchema } from 'graphql';
-import email from './email';
 import redis from './redis';
 import passport from './passport';
 import schema from './schema';
@@ -81,34 +80,6 @@ app.use(passport.session());
 app.use(flash());
 
 app.use(accountRoutes);
-
-// The following routes are intended to be used in development mode only
-if (process.env.NODE_ENV !== 'production') {
-  // A route for testing email templates
-  app.get('/:email(email|emails)/:template', (req, res) => {
-    const message = email.render(req.params.template, { t: req.t, v: 123 });
-    res.send(message.html);
-  });
-
-  // A route for testing authentication/authorization
-  app.get('/', (req, res) => {
-    if (req.user) {
-      res.send(
-        `<p>${req.t('Welcome, {{user}}!', {
-          user: req.user.displayName,
-        })} (<a href="javascript:fetch('/login/clear', { method: 'POST', credentials: 'include' }).then(() => window.location = '/')">${req.t(
-          'log out',
-        )}</a>)</p>`,
-      );
-    } else {
-      res.send(
-        `<p>${req.t('Welcome, guest!')} (<a href="/login/facebook">${req.t(
-          'sign in',
-        )}</a>)</p>`,
-      );
-    }
-  });
-}
 
 app.get('/graphql/schema', (req, res) => {
   res.type('text/plain').send(printSchema(schema));

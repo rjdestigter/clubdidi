@@ -5,15 +5,15 @@ import { GraphQLList, GraphQLString, GraphQLBoolean } from 'graphql';
 import MemberType from './MemberType';
 import ValidationError from './ValidationError';
 
-import db from '../db'
-import validator from 'validator';
+import db from '../db';
+// import validator from 'validator';
 
 import {
   fromGlobalId,
-  connectionDefinitions,
-  forwardConnectionArgs,
-  connectionFromArraySlice,
-  cursorToOffset,
+  // connectionDefinitions,
+  // forwardConnectionArgs,
+  // connectionFromArraySlice,
+  // cursorToOffset,
   mutationWithClientMutationId,
 } from 'graphql-relay';
 
@@ -23,9 +23,9 @@ export default {
     const result = await db
       .table('members')
       .orderBy('created_at', 'desc')
-      .then(rows => rows.map(x => Object.assign(x, { __type: 'Member' })))
+      .then(rows => rows.map(x => Object.assign(x, { __type: 'Member' })));
 
-    return result
+    return result;
   },
 };
 
@@ -60,11 +60,11 @@ function validate(input, { t, user }) {
   const errors = [];
   const data = {};
 
-  if (!user) {
-    throw new ValidationError([
-      { key: '', message: t('Only authenticated users can create members.') },
-    ]);
-  }
+  // if (!user) {
+  //   throw new ValidationError([
+  //     { key: '', message: t('Only authenticated users can create members.') },
+  //   ]);
+  // }
 
   if (typeof input.firstName === 'undefined' || input.firstName.trim() === '') {
     errors.push({
@@ -93,7 +93,10 @@ function validate(input, { t, user }) {
     data.email = input.email;
   }
 
-  if (typeof input.dateOfBirth === 'undefined' || input.dateOfBirth.trim() === '') {
+  if (
+    typeof input.dateOfBirth === 'undefined' ||
+    input.dateOfBirth.trim() === ''
+  ) {
     errors.push({
       key: 'dateOfBirth',
       message: t('800'),
@@ -111,7 +114,7 @@ function validate(input, { t, user }) {
     data.payed = input.payed;
   }
 
-  data.volunteer = !!input.volunteer
+  data.volunteer = !!input.volunteer;
 
   return { data, errors };
 }
@@ -129,5 +132,44 @@ export const createMember = mutationWithClientMutationId({
 
     const rows = await db.table('members').insert(data).returning('id');
     return context.members.load(rows[0]).then(member => member);
+  },
+});
+
+export const updateMember = mutationWithClientMutationId({
+  name: 'UpdateMember',
+  inputFields: {
+    id: {
+      type: GraphQLString,
+    },
+    ...inputFields,
+  },
+  outputFields,
+  async mutateAndGetPayload(input, context) {
+    const { t, memberById } = context;
+    const { type, id } = fromGlobalId(input.id);
+
+    if (type !== 'Member') {
+      throw new Error(t('The member ID is invalid.'));
+    }
+
+    const { data, errors } = validate(input, context);
+    const member = await db.table('members').where('id', '=', id).first('*');
+
+    if (!member) {
+      errors.push({
+        key: '',
+        message: 'Failed to save member. Please make sure that it exists.',
+      });
+    }
+
+    if (errors.length) {
+      throw new ValidationError(errors);
+    }
+
+    data.updated_at = db.raw('CURRENT_TIMESTAMP');
+
+    await db.table('members').where('id', '=', id).update(data);
+
+    return memberById.load(id).then(x => ({ member: x }));
   },
 });

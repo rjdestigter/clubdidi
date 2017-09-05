@@ -1,0 +1,73 @@
+version: '3'
+
+volumes:
+  data:
+  redis:
+
+services:
+
+  db:
+    image: postgres:9.6.4-alpine
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=xxx
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    volumes:
+      - data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:4.0.1-alpine
+    restart: always
+    read_only: true
+    volumes:
+      - redis:/data
+
+  clubdidi-web:
+    image: clubdidi-web
+    read_only: true
+    restart: always
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - NODE_DEBUG=false
+    expose:
+      - '5000'
+    ports:
+      - '80:5000'
+
+  api:
+    image: api
+    read_only: true
+    restart: always
+    depends_on:
+      - db
+      - redis
+    links:
+      - db
+      - redis
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - NODE_DEBUG=false
+      - WEBSITE_URL=https://admin.theatreoutre.ca
+      - FRONTEND_HOST_WHITELIST=localhost
+      - CORS_ORIGIN=http://localhost,http://localhost:5000,http://localhost:3001,http://localhost:8000
+      - DATABASE_URL=postgres://postgres:xxx@db:5432/clubdidi
+      - DATABASE_DEBUG=false
+      - REDIS_URL=redis://redis:6379/1
+      - SESSION_SECRET=xxx
+      - FACEBOOK_ID=xxx
+      - FACEBOOK_SECRET=xxx
+      - GOOGLE_ID=xxx
+      - GOOGLE_SECRET=xxx
+      - TWITTER_KEY=xxx
+      - TWITTER_SECRET=xxx
+    expose:
+      - '3000'
+    ports:
+      - '8080:3000'

@@ -9,7 +9,12 @@
 
 /* @flow */
 
-import { GraphQLObjectType, GraphQLString, GraphQLBoolean } from 'graphql';
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLBoolean,
+  GraphQLList,
+} from 'graphql';
 import { globalIdField } from 'graphql-relay';
 import { nodeInterface } from './Node';
 
@@ -52,6 +57,14 @@ export default new GraphQLObjectType({
       type: GraphQLBoolean,
       resolve(parent) {
         return parent.volunteer;
+      },
+    },
+
+    roles: {
+      type: new GraphQLList(GraphQLString),
+      resolve(parent) {
+        const roles = parent.roles;
+        return roles.split(',').map(role => role.trim()).filter(role => !!role);
       },
     },
 
