@@ -131,7 +131,7 @@ export const createMember = mutationWithClientMutationId({
     }
 
     const rows = await db.table('members').insert(data).returning('id');
-    return context.members.load(rows[0]).then(member => member);
+    return context.members.load(rows[0]).then(member => ({ member }));
   },
 });
 
@@ -170,6 +170,8 @@ export const updateMember = mutationWithClientMutationId({
 
     await db.table('members').where('id', '=', id).update(data);
 
-    return memberById.load(id).then(x => ({ member: x }));
+    return memberById
+      .load(id)
+      .then(updatedMember => ({ member: updatedMember }));
   },
 });
