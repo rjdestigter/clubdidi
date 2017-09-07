@@ -41,7 +41,7 @@ services:
       - /var/run/postgresql
     volumes:
       - db:/var/lib/postgresql/data
-      - ./postgres-initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
+      # - ./postgres-initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
     ports:
       - '5432:5432'
     #   - "127.0.0.1:5432:5432" # you can override it via docker-compose.override.yml

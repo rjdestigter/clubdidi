@@ -48,6 +48,9 @@ const inputFields = {
   payed: {
     type: GraphQLString,
   },
+  roles: {
+    type: new GraphQLList(GraphQLString),
+  },
 };
 
 const outputFields = {
@@ -105,13 +108,14 @@ function validate(input, { t, user }) {
     data.date_of_birth = input.dateOfBirth;
   }
 
-  if (typeof input.payed === 'undefined' || input.payed.trim() === '') {
-    errors.push({
-      key: 'payed',
-      message: t('800'),
-    });
-  } else {
+  if (input.payed === false) {
+    data.payed = null;
+  } else if (input.payed) {
     data.payed = input.payed;
+  }
+
+  if (Array.isArray(input.roles)) {
+    data.roles = input.roles.join(',');
   }
 
   data.volunteer = !!input.volunteer;
