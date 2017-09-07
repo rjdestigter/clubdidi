@@ -48,6 +48,9 @@ const inputFields = {
   payed: {
     type: GraphQLString,
   },
+  roles: {
+    type: new GraphQLList(GraphQLString),
+  },
 };
 
 const outputFields = {
@@ -114,7 +117,10 @@ function validate(input, { t, user }) {
     data.payed = input.payed;
   }
 
-  data.volunteer = !!input.volunteer;
+  if (input.roles && Array.isArray(input.roles)) {
+    data.roles = input.roles.join(',');
+    data.volunteer = !!data.roles.length;
+  }
 
   return { data, errors };
 }

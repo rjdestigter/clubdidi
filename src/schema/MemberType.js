@@ -18,6 +18,14 @@ import {
 import { globalIdField } from 'graphql-relay';
 import { nodeInterface } from './Node';
 
+function leadingZero(value) {
+  if (value < 10) {
+    return `0${value}`;
+  }
+
+  return value;
+}
+
 export default new GraphQLObjectType({
   name: 'Member',
   interfaces: [nodeInterface],
@@ -49,7 +57,18 @@ export default new GraphQLObjectType({
     dateOfBirth: {
       type: GraphQLString,
       resolve(parent) {
-        return parent.date_of_birth;
+        if (parent.date_of_birth) {
+          try {
+            const dob = new Date(parent.date_of_birth);
+            return `${leadingZero(dob.getUTCDate())}/${leadingZero(
+              dob.getUTCMonth() + 1,
+            )}/${dob.getUTCFullYear()}`;
+          } catch (error) {
+            return '';
+          }
+        }
+
+        return '';
       },
     },
 
