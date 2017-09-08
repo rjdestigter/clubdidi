@@ -114,14 +114,18 @@ function validate(input, { t, user }) {
     data.payed = input.payed;
   }
 
+<<<<<<< HEAD
   if (Array.isArray(input.roles)) {
     data.roles = input.roles.join(',');
   }
 
+  data.volunteer = !!input.volunteer;
+=======
   if (input.roles && Array.isArray(input.roles)) {
     data.roles = input.roles.join(',');
     data.volunteer = !!data.roles.length;
   }
+>>>>>>> b2ec34a4e6741795ac01771874008f721eb8548a
 
   return { data, errors };
 }

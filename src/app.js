@@ -18,36 +18,25 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import flash from 'express-flash';
-import i18next from 'i18next';
-import i18nextMiddleware, {
-  LanguageDetector,
-} from 'i18next-express-middleware';
-import i18nextBackend from 'i18next-node-fs-backend';
 import expressGraphQL from 'express-graphql';
 import PrettyError from 'pretty-error';
+import jwt from 'jwt-simple';
 import { printSchema } from 'graphql';
+
 import redis from './redis';
 import passport from './passport';
 import schema from './schema';
 import DataLoaders from './DataLoaders';
 import accountRoutes from './routes/account';
-
-i18next.use(LanguageDetector).use(i18nextBackend).init({
-  preload: ['en', 'de'],
-  ns: ['common', 'email'],
-  fallbackNS: 'common',
-  detection: {
-    lookupCookie: 'lng',
-  },
-  backend: {
-    loadPath: path.resolve(__dirname, '../locales/{{lng}}/{{ns}}.json'),
-    addPath: path.resolve(__dirname, '../locales/{{lng}}/{{ns}}.missing.json'),
-  },
-});
+import auth from './auth';
+import users from './users';
+import cfg from './jwt-config';
 
 const app = express();
 
 app.set('trust proxy', 'loopback');
+
+app.use(auth.initialize());
 
 app.use(
   cors({
@@ -62,24 +51,50 @@ app.use(
 );
 
 app.use(compression());
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(
-  session({
-    store: new (connectRedis(session))({ client: redis }),
-    name: 'sid',
-    resave: true,
-    saveUninitialized: true,
-    secret: process.env.SESSION_SECRET,
-  }),
-);
-app.use(i18nextMiddleware.handle(i18next));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(flash());
 
-app.use(accountRoutes);
+app.post('/token', (req, res) => {
+  console.log(req.body);
+  if (req.body.email && req.body.password) {
+    const email = req.body.email;
+    const password = req.body.password;
+    console.log(req.email, password);
+    const user = users.find(u => u.email === email && u.password === password);
+    console.log('User', user);
+    if (user) {
+      const payload = {
+        id: user.id,
+      };
+      const token = jwt.encode(payload, cfg.jwtSecret);
+      console.log('Token', token);
+      res.json({
+        token,
+      });
+    } else {
+      res.sendStatus(401);
+    }
+  } else {
+    res.sendStatus(401);
+  }
+});
+
+// app.use(
+//   session({
+//     store: new (connectRedis(session))({ client: redis }),
+//     name: 'sid',
+//     resave: true,
+//     saveUninitialized: true,
+//     secret: process.env.SESSION_SECRET,
+//   }),
+// );
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+// app.use(flash());
+
+// app.use(accountRoutes);
 
 app.get('/graphql/schema', (req, res) => {
   res.type('text/plain').send(printSchema(schema));
@@ -87,6 +102,7 @@ app.get('/graphql/schema', (req, res) => {
 
 app.use(
   '/graphql',
+  auth.authenticate(),
   expressGraphQL(req => ({
     schema,
     context: {
