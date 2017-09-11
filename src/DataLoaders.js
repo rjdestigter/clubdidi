@@ -37,19 +37,19 @@ function mapTo(keys, keyFn, type, rows) {
   return Array.from(group.values());
 }
 
-function mapToMany(keys, keyFn, type, rows) {
-  if (!rows) return mapToMany.bind(null, keys, keyFn, type);
-  const group = new Map(keys.map(key => [key, []]));
-  rows.forEach(row => group.get(keyFn(row)).push(assignType(row, type)));
-  return Array.from(group.values());
-}
-
-function mapToValues(keys, keyFn, valueFn, rows) {
-  if (!rows) return mapToValues.bind(null, keys, keyFn, valueFn);
-  const group = new Map(keys.map(key => [key, null]));
-  rows.forEach(row => group.set(keyFn(row), valueFn(row)));
-  return Array.from(group.values());
-}
+// function mapToMany(keys, keyFn, type, rows) {
+//   if (!rows) return mapToMany.bind(null, keys, keyFn, type);
+//   const group = new Map(keys.map(key => [key, []]));
+//   rows.forEach(row => group.get(keyFn(row)).push(assignType(row, type)));
+//   return Array.from(group.values());
+// }
+//
+// function mapToValues(keys, keyFn, valueFn, rows) {
+//   if (!rows) return mapToValues.bind(null, keys, keyFn, valueFn);
+//   const group = new Map(keys.map(key => [key, null]));
+//   rows.forEach(row => group.set(keyFn(row), valueFn(row)));
+//   return Array.from(group.values());
+// }
 
 export default {
   create: () => ({
@@ -61,6 +61,22 @@ export default {
         .then(mapTo(keys, x => x.id, 'User')),
     ),
 
+    attendance: new DataLoader(keys =>
+      db
+        .table('attendance')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id, 'Attendance')),
+    ),
+
+    attendanceById: new DataLoader(keys =>
+      db
+        .table('attendances')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id, 'Attendance')),
+    ),
+
     members: new DataLoader(keys =>
       db
         .table('members')
@@ -68,12 +84,29 @@ export default {
         .select()
         .then(mapTo(keys, x => x.id, 'Member')),
     ),
+
     memberById: new DataLoader(keys =>
       db
         .table('members')
         .whereIn('id', keys)
         .select()
         .then(mapTo(keys, x => x.id, 'Member')),
+    ),
+
+    events: new DataLoader(keys =>
+      db
+        .table('events')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id, 'Event')),
+    ),
+
+    eventById: new DataLoader(keys =>
+      db
+        .table('events')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id, 'Event')),
     ),
   }),
 };

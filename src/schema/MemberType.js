@@ -1,13 +1,4 @@
-/**
- * Node.js API Starter Kit (https://reactstarter.com/nodejs)
- *
- * Copyright © 2016-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
-/* @flow */
+// @flow
 
 import {
   GraphQLObjectType,
@@ -90,7 +81,7 @@ export default new GraphQLObjectType({
     payed: {
       type: GraphQLBoolean,
       resolve(parent) {
-        return parent.payed;
+        return !!parent.payed;
       },
     },
   },

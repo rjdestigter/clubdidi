@@ -11,18 +11,20 @@
 
 import { GraphQLSchema, GraphQLObjectType } from 'graphql';
 
-import { me } from './User';
 import { node, nodes } from './Node';
 import members, { createMember, updateMember } from './Members';
+import events, { createEvent, updateEvent } from './Events';
+import attendance, { createAttendance } from './Attendance';
 
 export default new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'Query',
     fields: {
-      me,
       node,
       nodes,
       members,
+      events,
+      attendance,
     },
   }),
   mutation: new GraphQLObjectType({
@@ -30,6 +32,9 @@ export default new GraphQLSchema({
     fields: {
       createMember,
       updateMember,
+      createEvent,
+      updateEvent,
+      createAttendance,
     },
   }),
 });

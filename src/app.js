@@ -9,25 +9,25 @@
 
 /* @flow */
 
-import path from 'path';
+// import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
-import cookieParser from 'cookie-parser';
+// import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import flash from 'express-flash';
+// import session from 'express-session';
+// import connectRedis from 'connect-redis';
+// import flash from 'express-flash';
 import expressGraphQL from 'express-graphql';
 import PrettyError from 'pretty-error';
 import jwt from 'jwt-simple';
 import { printSchema } from 'graphql';
 
-import redis from './redis';
-import passport from './passport';
+// import redis from './redis';
+// import passport from './passport';
 import schema from './schema';
 import DataLoaders from './DataLoaders';
-import accountRoutes from './routes/account';
+// import accountRoutes from './routes/account';
 import auth from './auth';
 import users from './users';
 import cfg from './jwt-config';
@@ -56,19 +56,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.post('/token', (req, res) => {
-  console.log(req.body);
   if (req.body.email && req.body.password) {
     const email = req.body.email;
     const password = req.body.password;
-    console.log(req.email, password);
     const user = users.find(u => u.email === email && u.password === password);
-    console.log('User', user);
+
     if (user) {
       const payload = {
         id: user.id,
       };
       const token = jwt.encode(payload, cfg.jwtSecret);
-      console.log('Token', token);
+
       res.json({
         token,
       });
@@ -102,7 +100,7 @@ app.get('/graphql/schema', (req, res) => {
 
 app.use(
   '/graphql',
-  auth.authenticate(),
+  // auth.authenticate(),
   expressGraphQL(req => ({
     schema,
     context: {

@@ -1,13 +1,6 @@
 // @flow
 
 import { GraphQLList, GraphQLString, GraphQLBoolean } from 'graphql';
-
-import MemberType from './MemberType';
-import ValidationError from './ValidationError';
-
-import db from '../db';
-// import validator from 'validator';
-
 import {
   fromGlobalId,
   // connectionDefinitions,
@@ -17,9 +10,20 @@ import {
   mutationWithClientMutationId,
 } from 'graphql-relay';
 
+import MemberType from './MemberType';
+import ValidationError from './ValidationError';
+
+import db from '../db';
+// import validator from 'validator';
+
 export default {
   type: new GraphQLList(MemberType),
-  async resolve(root, args, { members }) {
+  inputFields: {
+    firstName: {
+      type: GraphQLString,
+    },
+  },
+  async resolve() {
     const result = await db
       .table('members')
       .orderBy('created_at', 'desc')
@@ -59,15 +63,9 @@ const outputFields = {
   },
 };
 
-function validate(input, { t, user }) {
+function validate(input, { t }) {
   const errors = [];
   const data = {};
-
-  // if (!user) {
-  //   throw new ValidationError([
-  //     { key: '', message: t('Only authenticated users can create members.') },
-  //   ]);
-  // }
 
   if (typeof input.firstName === 'undefined' || input.firstName.trim() === '') {
     errors.push({

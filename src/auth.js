@@ -10,7 +10,6 @@ const params = {
 };
 
 const strategy = new Strategy(params, (payload, done) => {
-  console.log('Strategy', params, payload);
   const user = users.find(u => u.id === payload.id);
 
   if (user) {
