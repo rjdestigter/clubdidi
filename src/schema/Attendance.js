@@ -24,11 +24,15 @@ export default {
     if (event) where.event_id = event;
     if (member) where.member_id = member;
 
-    const result = await db
-      .table('attendance')
-      .where(where)
-      .then(rows => rows.map(x => Object.assign(x, { __type: 'Attendance' })));
-
+    const result = await db.table('attendance').where(where).then(rows =>
+      rows.map(attendance =>
+        Object.assign(attendance, {
+          __type: 'Attendance',
+        }),
+      ),
+    );
+    console.log('RESULT============================');
+    console.log(result);
     return result;
   },
 };
@@ -69,9 +73,7 @@ export const createAttendance = mutationWithClientMutationId({
       throw new ValidationError(errors);
     }
 
-    console.log('Data', data);
     const rows = await db.table('attendance').insert(data).returning('id');
-    console.log('Rows', rows);
     return context.attendance
       .load(rows[0])
       .then(attendance => ({ attendance }));
