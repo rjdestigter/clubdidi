@@ -14,7 +14,7 @@ import { GraphQLSchema, GraphQLObjectType } from 'graphql';
 import { node, nodes } from './Node';
 import members, { createMember, updateMember } from './Members';
 import events, { createEvent, updateEvent } from './Events';
-import attendance, { createAttendance } from './Attendance';
+import attendance, { createAttendance, deleteAttendance } from './Attendance';
 
 export default new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -35,6 +35,7 @@ export default new GraphQLSchema({
       createEvent,
       updateEvent,
       createAttendance,
+      deleteAttendance,
     },
   }),
 });

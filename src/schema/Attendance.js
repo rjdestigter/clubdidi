@@ -79,3 +79,21 @@ export const createAttendance = mutationWithClientMutationId({
       .then(attendance => ({ attendance }));
   },
 });
+
+export const deleteAttendance = mutationWithClientMutationId({
+  name: 'DeleteAttendance',
+  inputFields,
+  outputFields: {
+
+  },
+  async mutateAndGetPayload(input, context) {
+    const { data, errors } = validate(input);
+
+    if (errors.length) {
+      throw new ValidationError(errors);
+    }
+
+    await db.table('attendance').where(data).del()
+    return {}
+  },
+});
