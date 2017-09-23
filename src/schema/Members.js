@@ -63,14 +63,14 @@ const outputFields = {
   },
 };
 
-function validate(input, { t }) {
+function validate(input) {
   const errors = [];
   const data = {};
 
   if (typeof input.firstName === 'undefined' || input.firstName.trim() === '') {
     errors.push({
       key: 'title',
-      message: t('800'),
+      message: '800',
     });
   } else {
     data.first_name = input.firstName;
@@ -79,7 +79,7 @@ function validate(input, { t }) {
   if (typeof input.lastName === 'undefined' || input.lastName.trim() === '') {
     errors.push({
       key: 'lastName',
-      message: t('800'),
+      message: '800',
     });
   } else {
     data.last_name = input.lastName;
@@ -88,7 +88,7 @@ function validate(input, { t }) {
   if (typeof input.email === 'undefined' || input.email.trim() === '') {
     errors.push({
       key: 'email',
-      message: t('800'),
+      message: '800',
     });
   } else {
     data.email = input.email;
@@ -100,7 +100,7 @@ function validate(input, { t }) {
   ) {
     errors.push({
       key: 'dateOfBirth',
-      message: t('800'),
+      message: '800',
     });
   } else {
     data.date_of_birth = input.dateOfBirth;
